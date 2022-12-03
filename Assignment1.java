@@ -1,7 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.io.*;
 //import java.sql.*;
 
@@ -167,12 +164,67 @@ public class Assignment1 {
             }
         }
     }
+    private void calculateSimilarity(){
+        Float maximal_distance;
+        CallableStatement cs = null;
+        /*try{
+            cs = this.conn.prepareCall("{? = call MAXIMALDISTANCE()}");
+            //cs.registerOutParameter(1, com.microsoft.sqlserver.jdbc.SQL);
+            cs.execute();
+            maximal_distance = cs.MAXIMALDISTANCE(1); // res - maximaldistance
+
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }*/
+        PreparedStatement ps = null;
+        String selectMIDS = "Select MID from MediaItems;";
+        try {
+            ps = conn.prepareStatement(selectMIDS);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next())
+            {
+               // System.out.println(rs.getString(1).getClass()); //or rs.getString("column name");
+                Float mid1 = Float.parseFloat(rs.getString(1));
+                PreparedStatement ps2 = null;
+                String selectMIDS2 = "Select MID from mayasos.dbo.MediaItems where MID>?;";
+                ps2.setInt(1, Integer.parseInt(rs.getString(1)));
+                ps2 = conn.prepareStatement(selectMIDS2);
+                ResultSet rs2 = ps2.executeQuery();
+                while(rs2.next()){
+                    Float mid2 = Float.parseFloat(rs2.getString(1));
+
+
+
+                }
+
+            }
+        }
+        catch (SQLException e) {
+            try{
+                conn.rollback();
+            }catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+            e.printStackTrace();
+        }finally{
+            try{
+                if(ps != null){
+                    ps.close();
+                }
+            }catch (SQLException e3) {
+                e3.printStackTrace();
+            }
+        }
+    }
 
 
     public static void main(String[] args) {
         Assignment1 t= new Assignment1("mayasos","mayasos","rb2SWVYd"); //constructor
         //t.connect();
-        t.fileToDataBase("films.csv");
+        //t.fileToDataBase("films.csv");
+        t.calculateSimilarity();
 		//t.createTable();
 //		t.insertData(1, "Pulp Fiction", 1994);
 //		t.insertData(2, "The Silence of the Lambs", 1991);
